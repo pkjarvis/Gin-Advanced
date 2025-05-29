@@ -4,10 +4,33 @@ import (
     // "net/http"
     "github.com/gin-gonic/gin"
 	"go-tutorial/controllers"
+	"go-tutorial/internal/database"
+	"go-tutorial/services"
+	
 )
 
 func main(){
     r:=gin.Default()
+
+	db:=internal.InitDB()
+
+	if db==nil{
+		// error while connecting to db
+		return;
+	}
+
+	notesService:=&services.NotesService{}
+	notesService.InitService(db);
+	notesController:=&controllers.NotesController{}
+	notesController.InitController(*notesService)
+	notesController.InitRoutes(r)
+
+	authService:=services.InitAuthService(db)
+
+	authController:=controllers.InitAuthController(authService)
+	authController.InitRoutes(r)
+
+
 
     // Note: Go mod init creates go.mod file which contains the packages 
 
@@ -126,8 +149,9 @@ func main(){
 	// })
 
 
-    notesController:=&controllers.NotesController{}
-	notesController.InitNotesControllerRoutes(r)
+    // notesController:=&controllers.NotesController{}
+	// notesController.InitController(*notesService)
+	// notesController.InitRoutes(r)
 
     
 
